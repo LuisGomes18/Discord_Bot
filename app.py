@@ -166,7 +166,7 @@ async def info(ctx):
         description='Informações sobre o bot:',
         color=discord.Color.red()
     )
-    embed.add_field(name='Prefixo', value=prefixo, inline=False)
+    embed.add_field(name='Prefixo', value="??", inline=False)
     embed.add_field(name='Nome do Bot', value=bot.user.name, inline=False)
     embed.add_field(name='ID do Bot', value=bot.user.id, inline=False)
     embed.add_field(name='Criador do bot', value="Luís Gomes", inline=False)
@@ -256,4 +256,4 @@ async def unmute(ctx, member: discord.Member):
         await ctx.send(f'O usuário {member.mention} não está mutado.')
 
 
-bot.run("TOKEN DO BOT ")
+bot.run("TOKEN DO BOT")
