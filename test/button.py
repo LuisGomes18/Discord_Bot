@@ -43,4 +43,4 @@ async def menu(ctx):
         await ctx.send("Tempo esgotado! Por favor, tente novamente.")
 
 
-bot.run("MTIxNDE0ODQ5MDIxMzQ1Nzk0MA.G7pMzV.Ow7vxHLT0Hu3Gbcy_wa1kBVPzJrvTX_R8vfR6w")  # Run the bot
+bot.run("Token")  # Run the bot
