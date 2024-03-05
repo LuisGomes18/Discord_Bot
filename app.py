@@ -38,6 +38,12 @@ async def on_command_error(ctx, error):
 
 
 @bot.event
+async def warm_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("Desculpe, você não tem permissão para usar este comando.")
+
+
+@bot.event
 async def on_member_join(member):
     if id_boas_vindas is not None:
         canal_boas_vindas = bot.get_channel(id_boas_vindas)
