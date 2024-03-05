@@ -250,4 +250,4 @@ async def unmute(ctx, member: discord.Member):
         await ctx.send(f'O usuário {member.mention} não está mutado.')
 
 
-bot.run("TOKEN DO BOT")
+bot.run("TOKEN DO BOT ")

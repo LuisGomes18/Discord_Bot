@@ -86,3 +86,4 @@ def guardar_id_despedidas(mydb, cursor, id_despedidas):
         print('Erro ao guardar o ID de despedidas')
         print("Erro ao acessar o banco de dados:", error)
         exit(1)
+
