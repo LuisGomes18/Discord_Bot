@@ -2,6 +2,9 @@ import mysql.connector
 from datetime import *
 import pytz
 import asyncio
+import random
+from googletrans import Translator
+import requests
 import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions
@@ -20,6 +23,7 @@ token = buscar_token(cursor)
 prefixo = carregar_prefixo(cursor)
 id_boas_vindas = carregar_boas_vindas(cursor)
 id_despedidas = carregar_despedidas(cursor)
+api_key = carregar_api_key(cursor)
 
 intents = discord.Intents.all()
 bot = commands.Bot("??", intents=intents)
@@ -88,6 +92,12 @@ async def ajuda(ctx):
     embed.add_field(name='!unmute', value='Desmuta o usuario', inline=False)
     embed.add_field(name='!kick', value='Kick usuario', inline=False)
     embed.add_field(name='!info', value='Mostar as informações do bot', inline=False)
+    embed.add_field(name='!timeout', value='Silencia o usuario', inline=False)
+    embed.add_field(name='!rps', value='Jogar pedra, papel ou tessoura com o usuario', inline=False)
+    embed.add_field(name='!cara_coroa', value='Joga cara ou coroa com o usuario', inline=False)
+    embed.add_field(name='!dado', value='Jogar o dado', inline=False)
+    embed.add_field(name='!traducao', value='Traduz o texto', inline=False)
+
     await ctx.send(embed=embed)
 
 
@@ -115,6 +125,13 @@ async def despedidas(ctx, id: int):
     id_despedidas = id
     guardar_id_despedidas(mydb, cursor, id_despedidas)
     await ctx.send(f'O ID do canal de despedidas agora é {id}')
+
+
+@bot.command()
+async def api_tempo(ctx, *, api_key: str):
+    api = api_key
+    guardar_api_key(mydb, cursor, api)
+    await ctx.send(f'A key para API de tempo agora é {api_key}')
 
 
 @bot.command()
@@ -207,7 +224,7 @@ async def kick(ctx, member: discord.Member, *, reason=None):
 
 @bot.command()
 @commands.has_permissions(kick_members=True)
-async def timeout(ctx, member: discord.Member, duration: int, *, reason=None):
+async def mute(ctx, member: discord.Member, duration: int, *, reason=None):
     if member.top_role >= ctx.author.top_role:
         await ctx.send("Você não tem permissão para silenciar este usuário.")
     elif member == ctx.guild.me:
@@ -254,6 +271,84 @@ async def unmute(ctx, member: discord.Member):
         await ctx.send(f'O usuário {member.mention} foi desmutado.')
     else:
         await ctx.send(f'O usuário {member.mention} não está mutado.')
+
+
+@bot.command()
+async def cara_coroa(ctx, *, texto: str):
+    texto.lower()
+    if texto in ["cara", "coroa"]:
+        opcao_bot = random.choice(["cara", "coroa"])
+        valor_final = random.choice(["cara", "coroa"])
+        if texto == valor_final and opcao_bot == valor_final:
+            await ctx.send("Empate")
+        elif texto == valor_final and opcao_bot != valor_final:
+            await ctx.send("Vc ganhou")
+        elif texto != valor_final and opcao_bot == valor_final:
+            await ctx.send("Vc perdeu")
+        elif texto != valor_final and opcao_bot != valor_final:
+            await ctx.send("Empate")
+    else:
+        await ctx.send("Por favor, digite 'cara' ou 'coroa'")
+
+
+@bot.command()
+async def dado(ctx):
+    await ctx.send(f'Valor do dado é: {random.randint(1, 6)}')
+
+
+@bot.command()
+async def rps(ctx, escolha: str):
+    if escolha.lower() in ["pedra", "papel", "tesoura"]:
+        opcao_bot = random.choice(["pedra", "papel", "tesoura"])
+        if escolha == opcao_bot:
+            await ctx.send("Empate")
+        elif escolha == "pedra" and opcao_bot == "tesoura":
+            await ctx.send("Vc ganhou")
+        elif escolha == "papel" and opcao_bot == "pedra":
+            await ctx.send("Vc ganhou")
+        elif escolha == "tesoura" and opcao_bot == "papel":
+            await ctx.send("Vc ganhou")
+        else:
+            await ctx.send("Vc perdeu")
+    else:
+        await ctx.send("Por favor, digite 'pedra', 'papel' ou 'tesoura'")
+
+
+@bot.command()
+async def traducao(ctx, *, texto: str):
+    translator = Translator()
+    detect_language = translator.detect(texto).lang
+    translation = translator.translate(texto, src=detect_language, dest='pt')
+    await ctx.send(f'A tradução do texto é: {translation.text}')
+
+
+@bot.command()
+async def tempo(ctx, *, cidade: str):
+    url = f'http://api.openweathermap.org/data/2.5/weather?q={cidade}&appid={api_key}&units=metric'
+    response = requests.get(url)
+    data = response.json()
+
+    if data['cod'] == 200:
+        weather_description = data['weather'][0]['description']
+        translator = Translator()
+        detect_language = translator.detect(weather_description).lang
+        tempo_descricao = translator.translate(weather_description, src=detect_language, dest='pt')
+        temperature = data['main']['temp']
+        humidity = data['main']['humidity']
+        wind_speed = data['wind']['speed']
+        cidade_mod = cidade.capitalize()
+        embed = discord.Embed(
+            title=f'Tempo para {cidade_mod}',
+            description='Tempo do dia de Hoje',
+            color=discord.Color.blue()
+        )
+        embed.add_field(name='Descricão', value=tempo_descricao.text, inline=False)
+        embed.add_field(name='Temperatura', value=f'{temperature:.1f}°C', inline=False)
+        embed.add_field(name='Humidade', value=f'{humidity}%', inline=False)
+        embed.add_field(name='Velocidade do vento', value=f'{wind_speed} m/s', inline=False)
+        await ctx.send(embed=embed)
+    else:
+        await ctx.send('Cidade não encontrada!')
 
 
 bot.run("TOKEN DO BOT")
