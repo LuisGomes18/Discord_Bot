@@ -98,7 +98,6 @@ async def ajuda(ctx):
     embed.add_field(name='!dado', value='Jogar o dado', inline=False)
     embed.add_field(name='!traducao', value='Traduz o texto', inline=False)
     embed.add_field(name='!tempo', value='Mostra o tempo', inline=False)
-    embed.set_footer(text=f'Comando executado por {ctx.author.name}', icon_url=ctx.author.avatar_url)
 
     await ctx.send(embed=embed)
 
