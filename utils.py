@@ -66,8 +66,8 @@ def carregar_despedidas(cursor):
 
 def guardar_id_boas_vindas(mydb, cursor, id_boas_vindas):
     try:
-        query_guardar_boas_vindas = ("UPDATE server_testes_bot SET id_boas_vindas = %s WHERE nome_bot = 'Server Testes "
-                                     "Bot Official'")
+        query_guardar_boas_vindas = ("UPDATE server_testes_bot SET id_boas_vindas = %s WHERE nome_bot = 'Server "
+                                     "Testes Bot Official'")
         cursor.execute(query_guardar_boas_vindas, (id_boas_vindas,))
         mydb.commit()
     except mysql.connector.Error as error:
@@ -78,7 +78,7 @@ def guardar_id_boas_vindas(mydb, cursor, id_boas_vindas):
 
 def guardar_id_despedidas(mydb, cursor, id_despedidas):
     try:
-        query_guardar_despedidas = ("UPDATE server_testes_bot SET id_despedidas = %s WHERE nome_bot = 'Server Testes "
+        query_guardar_despedidas = ("UPDATE server_testes_bot SET id_despedidas = %s WHERE nome_bot = 'Server Testes"
                                     "Bot Official'")
         cursor.execute(query_guardar_despedidas, (id_despedidas,))
         mydb.commit()
@@ -87,3 +87,29 @@ def guardar_id_despedidas(mydb, cursor, id_despedidas):
         print("Erro ao acessar o banco de dados:", error)
         exit(1)
 
+
+def carregar_api_key(cursor):
+    try:
+        query_api_key = "SELECT key_tempo FROM server_testes_bot WHERE nome_bot = 'Server Testes Bot Official'"
+        cursor.execute(query_api_key)
+        api_key = cursor.fetchone()
+        if api_key:
+            return api_key[0]
+        else:
+            return None
+    except mysql.connector.Error as error:
+        print('Erro ao carregar a chave da API')
+        print("Erro ao acessar o banco de dados:", error)
+        exit(1)
+
+
+def guardar_api_key(mydb, cursor, api):
+    try:
+        query_guardar_api_key = ("UPDATE server_testes_bot SET key_tempo = %s WHERE nome_bot = 'Server Testes Bot "
+                                 "Official'")
+        cursor.execute(query_guardar_api_key, (api,))
+        mydb.commit()
+    except mysql.connector.Error as error:
+        print('Erro ao guardar a chave da API')
+        print("Erro ao acessar o banco de dados:", error)
+        exit(1)
